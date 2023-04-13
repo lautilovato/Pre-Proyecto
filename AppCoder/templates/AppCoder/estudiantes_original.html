@@ -3,16 +3,17 @@
 {% load static %}
 
 {% block titulo %}
-    <h1> Bienvenidos a la pagina de cursos </h1>
+    <h1> Bienvenidos Estudiantes </h1>
 {% endblock %}
 
 {% block contenido_que_cambia %}
-<h1>Lista de cursos</h1>
-    
+
+<h1>Lista de estudiantes</h1>
+
 <form action="" method="post">
     {% csrf_token %}
     <table>
-    {{ form.as_table }} <!-- Tipos de form: form.as_ / form.as_ul / form -->
+    {{ form.as_table }}  Tipos de form: form.as_ / form.as_ul / form 
     </table>
     <input type="submit" value="Agregar">
 </form>
@@ -22,24 +23,29 @@
         <tr>
             <th> ID </th>
             <th> Nombre </th>
-            <th> Comisión </th>
+            <th> Apellido </th>
+            <th> Email </th>
         </tr>
     </thead>
     <tbody>
         
-        {% for curso in cursos %}
+        {% for estudiante in estudiantes %}
         <tr>
             <td>
-                {{ curso.id }}
+                {{ estudiante.id }}
             </td>
             <td>
-                {{ curso.nombre }}
+                {{ estudiante.nombre}}
             </td>
             <td>
-                {{ curso.comision }}
+                {{ estudiante.apellido }}
+            </td>
+            <td>
+                {{ estudiante.email }}
             </td>
         </tr>
         {% endfor %}
     </tbody>
 </table>
-{% endblock %}
+
+{% endblock %} 
