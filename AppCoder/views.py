@@ -4,6 +4,11 @@ from .models import *
 from .forms import *
 from django.views.generic import ListView, DetailView, CreateView, UpdateView, DeleteView
 from django.urls import reverse_lazy
+from django.contrib.auth.forms import UserCreationForm, AuthenticationForm
+from django.contrib.auth import login, authenticate
+from django.contrib.auth.decorators import login_required
+from django.contrib.auth.mixins import LoginRequiredMixin
+
 
 def crear_curso(request):
     
@@ -27,6 +32,7 @@ def crear_profesor(request):
     respuesta= f"profesor creado: {nombre_profesor} - {apellido_profesor}"
     return HttpResponse(respuesta)
 
+@login_required
 def cursos(request):
     if request.method == "POST":
         form = CursoForm(request.POST)
@@ -43,6 +49,7 @@ def cursos(request):
     contexto = {"cursos" : cursos, "form" : form}
     return render(request, "AppCoder/cursos.html", contexto)
 
+@login_required
 def profesores(request):
     
     if request.method == "POST":
@@ -94,6 +101,7 @@ def eliminar_profesor(request, id):
     form = ProfesorForm()
     return render(request, "AppCoder/Profesores.html", {"profesores": profesores, "mensaje": "Profesor eliminado correctamente", "form": form})
 
+@login_required
 def estudiantes(request):
     if request.method == "POST":
         form = EstudianteForm(request.POST)
@@ -110,7 +118,7 @@ def estudiantes(request):
     estudiantes = Estudiante.objects.all()
     contexto = {"estudiantes" : estudiantes, "form" : form}
     return render(request, "AppCoder/estudiantes.html", contexto)
-
+@login_required
 def entregables(request):
     return render(request, "AppCoder/entregables.html")
 
@@ -134,24 +142,61 @@ def buscar(request):
 
 # vistas basadas en clases
 
-class Estudiante_list(ListView):
+class Estudiante_list(LoginRequiredMixin, ListView):
     model = Estudiante
     template_name = "AppCoder/estudiantes.html"
 
-class EstudianteCreacion(CreateView):#vista usada para CREAR
+class EstudianteCreacion(LoginRequiredMixin, CreateView):#vista usada para CREAR
     model= Estudiante
     success_url= reverse_lazy("estudiante_list")
     fields=['nombre', 'apellido', 'email']
 
-class EstudianteDetalle(DetailView): #vista usada para MOSTRAR DATOS
+class EstudianteDetalle(LoginRequiredMixin, DetailView): #vista usada para MOSTRAR DATOS
     model=Estudiante
     template_name="Appcoder/estudiante_detalle.html"
 
-class EstudianteDelete(DeleteView):#vista usada para ELIMINAR
+class EstudianteDelete(LoginRequiredMixin, DeleteView):#vista usada para ELIMINAR
     model=Estudiante
     success_url= reverse_lazy("estudiante_list")
 
-class EstudianteUpdate(UpdateView):#vista usada para EDITAR
+class EstudianteUpdate(LoginRequiredMixin, UpdateView):#vista usada para EDITAR
     model = Estudiante
     success_url = reverse_lazy('estudiante_list')
     fields=['nombre', 'apellido', 'email']
+
+# login, logout register
+
+def login_request(request):
+    if request.method=="POST":
+        form=AuthenticationForm(request, data=request.POST)
+        
+        if form.is_valid():
+            info=form.cleaned_data
+            
+            usu=info["username"]
+            clave=info["password"]
+            usuario=authenticate(username=usu, password=clave)#verifica si el usuario existe, si existe, lo devuelve, y si no devuelve None 
+            
+            if usuario is not None:
+                login(request, usuario)
+                return render(request, "AppCoder/inicio.html", {"mensaje":f"EL Usuario {usu} ha iniciado sesion correctamente"})
+            else:
+                return render(request, "AppCoder/login.html", {"form": form, "mensaje":"Usuario o contraseña incorrectos"})
+        else:
+            return render(request, "AppCoder/login.html", {"form": form, "mensaje":"Usuario o contraseña incorrectos"})
+    else:
+        form=AuthenticationForm()
+        return render(request, "AppCoder/login.html", {"form": form})
+    
+def register(request):
+    if request.method=="POST":
+        form= RegistroUsuarioForm(request.POST)
+        if form.is_valid():
+            username= form.cleaned_data.get("username")
+            form.save()
+            return render(request, "AppCoder/inicio.html", {"mensaje":f"Usuario {username} creado correctamente"})
+        else:
+            return render(request, "AppCoder/register.html", {"form": form, "mensaje":"Error al crear el usuario"})
+    else:
+        form= RegistroUsuarioForm()
+        return render(request, "AppCoder/register.html", {"form": form})
