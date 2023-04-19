@@ -22,4 +22,6 @@ urlpatterns = [
     path('login/', login_request, name= "login"),
     path('register/', register, name="register"),
     path('logout/', LogoutView.as_view(), name= "logout"), # otra opcion: LogoutView.as_view(template_name= "AppCoder/logout.html")
+    path('editar_perfil/', editar_perfil, name= "editar_perfil"),
+    path('agregar_avatar/', agregar_avatar, name= "agregar_avatar" ),
 ]

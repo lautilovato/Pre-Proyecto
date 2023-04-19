@@ -26,6 +26,8 @@
                 <a class="btn btn-primary" href="{% url 'estudiantes' %}">Estudiantes</a>
                 <a class="btn btn-primary" href="{% url 'profesores' %}">Profesores</a>
                 <a class="btn btn-primary" href="{% url 'entregables' %}">Entregables</a>
+                <img src="{{ avatar }}" alt="Avatar" style="width:50px;height:50px;"/>
+                <a class="btn btn-primary" href="{% url 'editar_perfil' %}">Editar Perfil</a>
                 <a class="btn btn-danger" href="{% url 'logout' %}">Logout</a>
                 {% else %}
                 <a class="btn btn-primary" href="{% url 'login' %}">Login</a>

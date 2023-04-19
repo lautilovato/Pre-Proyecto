@@ -1,4 +1,5 @@
 from django.db import models
+from django.contrib.auth.models import User
 
 class Curso(models.Model):
     nombre= models.CharField(max_length= 50) # campo de texto
@@ -25,3 +26,8 @@ class Entregable(models.Model):
     nombre= models.CharField(max_length= 50)
     fecha= models.DateField() # campo de tipo fecha 
     entregado= models.BooleanField() # campo de tipo bool
+
+class Avatar(models.Model):
+    imagen= models.ImageField(upload_to="avatars")
+    user=models.ForeignKey(User, on_delete=models.CASCADE)
+    #para usar imagenes voy a tener que installar Pillow. de que manera?  pip install Pillow
